@@ -1,2 +1,29 @@
-h1= title
-p Welcome to #{title}
+h1 Welcome to Light Bikes - similar (but not TRON)
+
+form(action="/join", method="post")
+	<br /><br />
+	label Name (required)
+	input(name="player")
+	<br /><br />
+	label Join Game Name (if not game entered - a waiting player will be joined
+	input(name="game")
+	<br /><br />
+	label Start
+	input(type="submit", value="Join")
+	
+	
+	
+	
+div#waitingGames
+	h2 Pending Games
+	ul
+		each item in waitingGames
+			li
+				a(href="/game/#{item}/", target="_blank")= item
+		
+		
+div#runningGames
+	h2 Running Games
+	ul
+		each item in runningGames
+			li= item
