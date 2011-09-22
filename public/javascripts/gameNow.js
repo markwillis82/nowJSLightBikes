@@ -1,4 +1,4 @@
-var state = 'guest';
+var state = 'Player1';
 var gameId;
 
 $(document).ready(function(){
@@ -12,17 +12,19 @@ $(document).ready(function(){
 	  }
 	
 	now.returnState = function(runningState){
+		runningState = "Player1";
 	    state = runningState;
+	    
 	    $("#state").html(state);
 	    if(state == "Player1") {
 	        kin.startAnimation();
-	        startCoord = startPos1;
-		    bikeCoord = startCoord;
+	        //startCoord = startPos1;
+		    //bikeCoord = startCoord;
 
 	    } else if(state == "Player2") {
 		    kin.startAnimation();
-		    startCoord = startPos2;
-		    bikeCoord = startCoord;
+		    //startCoord = startPos2;
+		    //bikeCoord = startCoord;
 	    
 	    } else if(state == "Spectator") {
 	        kin.startAnimation();
@@ -31,8 +33,8 @@ $(document).ready(function(){
 	  }
 	
 	now.receiveMove = function(player,newBikeCoord,newCurrentDirection) {
-		currentDirection = newCurrentDirection;
-		bikeCoord = newBikeCoord;
+		//currentDirection = newCurrentDirection;
+		//bikeCoord = newBikeCoord;
 	}
 	
 });

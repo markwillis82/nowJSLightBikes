@@ -2,30 +2,44 @@ var kin;
 var canvasWidth = 800;
 var canvasHeight = 500;
 var borderWidth = 10;
-
+var gameState = "running";
 /**
  * slight whoopsie - X = y and Y = x
  */
 
-var bikeCoord = {x : 400, y: 400, height: 10, width: 10};
-var oppCoord = {x : 400, y: 400, height: 10, width: 10};
-var startPos1 = {x : 400, y: 200, height: 10, width: 10};
-var startPos2 = {x : 400, y: 700, height: 10, width: 10};
-var startCoord;
+var bikeCoord = {};
+	bikeCoord["Player1"] = ({x : 400, y: 400, height: 10, width: 10});
+	bikeCoord["Player2"] = {x : 400, y: 400, height: 10, width: 10};
 
-var bikeHistory = [];
-var oppHistory = [];
+//var startPos1 = {x : 400, y: 200, height: 10, width: 10};
+//var startPos2 = {x : 400, y: 700, height: 10, width: 10};
+var startCoord = {};
+	startCoord["Player1"] = {x : 400, y: 200, height: 10, width: 10};
+	startCoord["Player2"] = {x : 400, y: 700, height: 10, width: 10};
+
+var bikeHistory = {};
+	bikeHistory["Player1"] = [];
+	bikeHistory["Player2"] = [];
 
 
 var maxBikeLength = 10;
 var bikeSpeed = 100;
 
-var startingDirection = "up";
-var historyDirection;
-var currentDirection;
+var startingDirection = [];
+	startingDirection["Player1"] = "up";
+	startingDirection["Player2"] = "left";
+
+var historyDirection = {};
+	historyDirection["Player1"];
+	historyDirection["Player2"];
+
+var currentDirection = {};
+	currentDirection["Player1"] = 'up';
+	currentDirection["Player2"] = 'down';
 
 $(document).ready(function(){
-	bikeCoord = startCoord;
+	bikeCoord["Player1"] = startCoord["Player1"];
+	bikeCoord["Player2"] = startCoord["Player2"];
 	
 	//$('body').keypress(changeDirection);
 		document.onkeydown = function(event) {
@@ -36,7 +50,7 @@ $(document).ready(function(){
 			  } else {
 			    keyCode = event.keyCode; 
 			  }
-			  changeDirection(keyCode);
+			  changeDirection(state,keyCode);
 			} else {
 				/** spectators cannot change canvas */
 			}
@@ -49,15 +63,15 @@ $(document).ready(function(){
 
     // set drawStage method
     kin.setDrawStage(function(){
-    	if(bikeCoord) {
-	    	updateBikeHistory("myBike",bikeCoord);
-	    	updateStage();
+    	if(gameState == "running") {
+    		
+	    	updateBikeHistory(state);
 	        kin.clear();
+	    	updateStage();
 	        drawBoundingBox();
 	        showFPS();
-	    
 	        var context = kin.getContext();
-	    	drawBike("myBike",bikeCoord);
+	    	drawBike(state);
     	}
     });
 
@@ -70,61 +84,72 @@ function showFPS() {
 }
 
 /* detect change in direction */
-function changeDirection(key) {
+function changeDirection(bikeState,key) {
 	if(key == 87) {
-		currentDirection = "up";
+		currentDirection[bikeState] = "up";
 	} else if(key == 65) { 
-		currentDirection = "left";
+		currentDirection[bikeState] = "left";
 	} else if(key == 83) { 
-		currentDirection = "down";
+		currentDirection[bikeState] = "down";
 	} else if(key == 68) { 
-		currentDirection = "right";
+		currentDirection[bikeState] = "right";
 	}
-   	now.sendMove(gameId,"Player",bikeCoord,currentDirection);
+   	//now.sendMove(gameId,bikeState,bikeCoord[bikeState],currentDirection[bikeState]);
 
 }
 
 /** update stage - new coord */
 function updateStage() {
 	var linearDistEachFrame = bikeSpeed * kin.getTimeInterval() / 1000;
-    
-	/*
-	 * check outside borders for collision / end game
-	 */
-    if(currentDirection == "down") { // move down
-        var currentX = bikeCoord.x;
-	    if (currentX < (kin.getCanvas().height- bikeCoord.height*2 - borderWidth)) { // move down
-	        var newX = currentX + linearDistEachFrame;
-	        bikeCoord.x = newX;
-	    } else {
-	    	endGame();
+	var playerNames =  {names:"Player1"/*, "Player2"*/};
+
+	for (playerPos in playerNames)	{
+		var player = playerNames[playerPos];
+		
+		/**
+		 * setup current direction if starting
+		 */
+		if(currentDirection[player] == '') {
+			currentDirection[player] = startingDirection[player];
+		}
+		/*
+		 * check outside borders for collision / end game
+		 */
+	    if(currentDirection[player] == "down") { // move down
+	        var currentX = bikeCoord[player].x;
+		    if (currentX < (kin.getCanvas().height- bikeCoord[player].height*2 - borderWidth)) { // move down
+		        var newX = currentX + linearDistEachFrame;
+		        bikeCoord[player].x = newX;
+		    } else {
+		    	endGame();
+		    }
+	    } else if(currentDirection[player] == "up") { // move up
+	        var currentX = bikeCoord[player].x;
+		    if (currentX > 0) { // move down
+		        var newX = currentX - linearDistEachFrame;
+		        bikeCoord[player].x = newX;
+		    } else {
+		    	endGame();
+		    }
+	    } else if(currentDirection[player] == "left") { // move left
+	        var currentY = bikeCoord[player].y;
+		    if (currentY > 0) { // move down
+		        var newY = currentY - linearDistEachFrame;
+		        bikeCoord[player].y = newY;
+		    } else {
+		    	endGame();
+		    }
+	    } else if(currentDirection[player] == "right") { // move right
+	        var currentY = bikeCoord[player].y;
+		    if (currentY < (kin.getCanvas().width- bikeCoord[player].height*2 - borderWidth)) { // move down
+		        var newY = currentY + linearDistEachFrame;
+		        bikeCoord[player].y = newY;
+		    } else {
+		    	endGame();
+		    }
 	    }
-    } else if(currentDirection == "up") { // move up
-        var currentX = bikeCoord.x;
-	    if (currentX > 0) { // move down
-	        var newX = currentX - linearDistEachFrame;
-	        bikeCoord.x = newX;
-	    } else {
-	    	endGame();
-	    }
-    } else if(currentDirection == "left") { // move left
-        var currentY = bikeCoord.y;
-	    if (currentY > 0) { // move down
-	        var newY = currentY - linearDistEachFrame;
-	        bikeCoord.y = newY;
-	    } else {
-	    	endGame();
-	    }
-    } else if(currentDirection == "right") { // move right
-        var currentY = bikeCoord.y;
-	    if (currentY < (kin.getCanvas().width- bikeCoord.height*2 - borderWidth)) { // move down
-	        var newY = currentY + linearDistEachFrame;
-	        bikeCoord.y = newY;
-	    } else {
-	    	endGame();
-	    }
-    }
-    
+	    //console.log(currentDirection[player]);
+	}
     /**
      * if we are a player - send our move to our gameGroup through nowJS
      */
@@ -139,20 +164,25 @@ function endGame() {
 
 
 /** update previous bike positions - limit **/
-function updateBikeHistory(whichBike,bikeData) {
+function updateBikeHistory(whichBike) {
+	var whichBike = "Player1";
 	var historyCoord = {x : 0, y: 0, height: 1, width: 1};
-
-	if(whichBike == "myBike") {
-		var history = bikeHistory;
-	} else {
-		var history = oppHistory;
+	var bikeData = bikeCoord[whichBike];
+	//console.log(bikeData);
+	
+	/**
+	 * setup current direction if starting
+	 */
+	if(currentDirection[whichBike] == '') {
+		currentDirection[whichBike] = startingDirection[whichBike];
 	}
-	if(historyDirection != currentDirection) {
+	
+	if(historyDirection[whichBike] != currentDirection[whichBike]) {
 		historyCoord.x = bikeData.x + (bikeData.width/2);
 		historyCoord.y = bikeData.y + (bikeData.height/2);
 
-		if(historyDirection == "up" && bikeHistory[0]) {
-			bikeHistory[0].x = historyCoord.x;
+		if(historyDirection[whichBike] == "up" && bikeHistory[whichBike][0]) {
+			bikeHistory[whichBike][0].x = historyCoord.x;
 		}
 		/*
 		if(historyDirection == "down" && bikeHistory[0]) {
@@ -172,72 +202,76 @@ function updateBikeHistory(whichBike,bikeData) {
 //		historyCoord.width = bikeData.width;
 //		historyCoord.height = bikeData.height;
 
-		var historyLength = bikeHistory.unshift(historyCoord);
+		var historyLength = bikeHistory[whichBike].unshift(historyCoord);
 //		console.log(bikeHistory);
 		
-		historyDirection = currentDirection;
+		historyDirection[whichBike] = currentDirection[whichBike];
 		
 	}
 	
 	
-    if(historyDirection == "down") { // move down
-    	bikeHistory[0].height = bikeData.x - bikeHistory[0].x;
+    if(historyDirection[whichBike] == "down") { // move down
+    	bikeHistory[whichBike][0].height = bikeData.x - bikeHistory[whichBike][0].x;
     
-    } else if(historyDirection == "up") { // move up
-    	bikeHistory[0].x = bikeData.x;
+    } else if(historyDirection[whichBike] == "up") { // move up
+    	bikeHistory[whichBike][0].x = bikeData.x;
     	/** to calculate width - we need to either have a previous coordinate, or a starting position */
-    	if(bikeHistory[1]) {
-    		bikeHistory[0].height = bikeHistory[1].x - bikeData.x;
+    	if(bikeHistory[whichBike][1]) {
+    		bikeHistory[whichBike][0].height = bikeHistory[whichBike][1].x - bikeData.x;
     	} else {
-    		bikeHistory[0].height = startCoord.x - bikeData.x;
+    		bikeHistory[whichBike][0].height = startCoord[whichBike].x - bikeData.x;
     	}
 
-    } else if(historyDirection == "left") { // move left
-    	bikeHistory[0].y = bikeData.y;
+    } else if(historyDirection[whichBike] == "left") { // move left
+    	bikeHistory[whichBike][0].y = bikeData.y;
     	/** to calculate width - we need to either have a previous coordinate, or a starting position */
-    	if(bikeHistory[1]) {
-    		bikeHistory[0].width = bikeHistory[1].y - bikeData.y;
+    	if(bikeHistory[whichBike][1]) {
+    		bikeHistory[whichBike][0].width = bikeHistory[whichBike][1].y - bikeData.y;
     	} else {
-    		bikeHistory[0].width = startCoord.y - bikeData.y;
+    		bikeHistory[whichBike][0].width = startCoord[whichBike].y - bikeData.y;
     	}
     	
-    } else if(historyDirection == "right") { // move right
-    	bikeHistory[0].width = bikeData.y - bikeHistory[0].y;
+    } else if(historyDirection[whichBike] == "right") { // move right
+    	
+    	bikeHistory[whichBike][0].width = bikeData.y - bikeHistory[whichBike][0].y;
     
     }
 
-    if(bikeHistory.length > maxBikeLength) {
-    	bikeHistory.splice(maxBikeLength,(bikeHistory.length-maxBikeLength));
-	}
-
+    if(bikeHistory[whichBike]) {
+	    if(bikeHistory[whichBike].length > maxBikeLength) {
+	    	bikeHistory[whichBike].splice(maxBikeLength,(bikeHistory[whichBike].length-maxBikeLength));
+		}
+    }
 }
 
 /** draw bike **/
-function drawBike(bikeId,bikePosition) {
+function drawBike(bikeId) {
 	var context = kin.getContext();
-	
+	var bikePosition = bikeCoord[bikeId];
+	//console.log(bikeId);
 	/** draw history blocks in different colour - then layer bike ontop */
-	context.beginPath();
-	for ( var int = 0; int < bikeHistory.length; int++) {
-		var history = bikeHistory[int];
-		
-		//console.log("draw: "+int);
-		
-	    context.rect(history.y, history.x, history.width, history.height);
-	 
-	    context.fillStyle = "#ccc";
-	    context.fill();
-	    context.lineWidth = 2;
-	    context.strokeStyle = "red";
-	}
-    context.stroke();
-	
+	if(bikeHistory[bikeId]) {
+		context.beginPath();
+		for ( var int = 0; int < bikeHistory[bikeId].length; int++) {
+			var history = bikeHistory[bikeId][int];
+			
+			//console.log("draw: "+int);
+			
+		    context.rect(history.y, history.x, history.width, history.height);
+		 
+		    context.fillStyle = "#ccc";
+		    context.fill();
+		    context.lineWidth = 2;
+		    context.strokeStyle = "red";
+		}
+	    context.stroke();
+	}	
     /*
      * detect collision with a line (lazy detection
      */
-    if(checkCollision(bikePosition.x,bikePosition.y,bikePosition.width,bikePosition.height)) {
+//    if(checkCollision(bikePosition.x,bikePosition.y,bikePosition.width,bikePosition.height)) {
 //    	endGame();
-    }
+//    }
 	var left = bikePosition.x;
 	var top = bikePosition.y;
 		

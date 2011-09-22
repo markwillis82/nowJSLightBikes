@@ -58,10 +58,12 @@ app.get('/game/:gameId/', function(req, res){
 		/** move game from pending to running */
 		waitingGames.splice(gameIndex,1);
 		runningGames.push(gameId);
+		
 	} else {
 		/** push game onto waiting list */
 		waitingGames.push(gameId);
 		stats[gameId] = [];
+		//everyone.now.updateWaiting(gameId);
 	}
 	
 	
@@ -69,7 +71,12 @@ app.get('/game/:gameId/', function(req, res){
 	    title: 'Light Bikes - game: '+ gameId,
 	    gameId: gameId
 	  });
+	
+	nowjs.on('connect', function () {
+		  this.now.connectMessage('Loading: ' + this.user.clientId);
 	});
+
+});
 
 
 /** start page **/
@@ -102,23 +109,20 @@ app.post('/join', function(req, res){
 /**
  * clever - aSync nowJS parts
  */
-nowjs.on('connect', function () {
-	  this.now.connectMessage('Loading: ' + this.user.clientId);
-});
 
 everyone.now.joinGame = function(gameId){
 	
-	if(stats[gameId].length > 2) {
+	/*if(stats[gameId].length > 2) {
 		var state = "Spectator";
 	
 	} else if(stats[gameId].length == 1) {
 		var state = "Player2";
 		stats[gameId].push(this.user.clientId);
 	
-	} else if(stats[gameId].length == 0) {
+	} else if(stats[gameId].length == 0) { */
 		var state = "Player1";
 		stats[gameId].push(this.user.clientId);
-	}
+	//}
 	var gameGroup = nowjs.getGroup(gameId);
 	gameGroup.addUser(this.user.clientId);
 	
