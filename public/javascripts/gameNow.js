@@ -1,4 +1,4 @@
-var state = 'Player1';
+var state = 'guest';
 var gameId;
 
 $(document).ready(function(){
@@ -12,8 +12,14 @@ $(document).ready(function(){
 	  }
 	
 	now.returnState = function(runningState){
-		runningState = "Player1";
+		if(state == "Player1" || state == "Player2") {
+			return; // this stops multiple callbacks
+		}
 	    state = runningState;
+	    
+    	gameState = "running";
+	    
+	    console.log("running as :" + state);
 	    
 	    $("#state").html(state);
 	    if(state == "Player1") {
@@ -30,11 +36,11 @@ $(document).ready(function(){
 	        kin.startAnimation();
 	    } 
 	    
-	  }
+	}
 	
 	now.receiveMove = function(player,newBikeCoord,newCurrentDirection) {
-		//currentDirection = newCurrentDirection;
-		//bikeCoord = newBikeCoord;
+		currentDirection[player] = newCurrentDirection;
+		bikeCoord[player] = newBikeCoord;
 	}
 	
 });

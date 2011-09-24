@@ -58,12 +58,14 @@ app.get('/game/:gameId/', function(req, res){
 		/** move game from pending to running */
 		waitingGames.splice(gameIndex,1);
 		runningGames.push(gameId);
+		console.log("\tGame Started: "+gameId);
 		
 	} else {
 		/** push game onto waiting list */
 		waitingGames.push(gameId);
 		stats[gameId] = [];
 		//everyone.now.updateWaiting(gameId);
+		console.log("\tGame Waiting: "+gameId);
 	}
 	
 	
@@ -112,17 +114,21 @@ app.post('/join', function(req, res){
 
 everyone.now.joinGame = function(gameId){
 	
-	/*if(stats[gameId].length > 2) {
+	if(stats[gameId].length > 1) {
 		var state = "Spectator";
+		console.log("\t\t\tAdding Spectator: "+gameId);
 	
 	} else if(stats[gameId].length == 1) {
 		var state = "Player2";
 		stats[gameId].push(this.user.clientId);
+		console.log("\t\t\tAdding Player2: "+gameId);
 	
-	} else if(stats[gameId].length == 0) { */
+	} else if(stats[gameId].length == 0) { 
 		var state = "Player1";
 		stats[gameId].push(this.user.clientId);
-	//}
+		console.log("\t\t\tAdding Player1: "+gameId);
+
+	}
 	var gameGroup = nowjs.getGroup(gameId);
 	gameGroup.addUser(this.user.clientId);
 	
@@ -131,6 +137,7 @@ everyone.now.joinGame = function(gameId){
 
 everyone.now.sendMove = function(gameId,player,bikeCoord,currentDirection) {
 	var gameGroup = nowjs.getGroup(gameId);
+	console.log("\t\tSending Move: "+ gameId + " - p:"+player);
 	gameGroup.exclude(this.user.clientId).now.receiveMove(player,bikeCoord,currentDirection);
 }
 

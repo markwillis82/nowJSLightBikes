@@ -2,7 +2,8 @@ var kin;
 var canvasWidth = 800;
 var canvasHeight = 500;
 var borderWidth = 10;
-var gameState = "running";
+var gameState = "waiting";
+var autoPlayer1Timer = false;
 /**
  * slight whoopsie - X = y and Y = x
  */
@@ -37,9 +38,25 @@ var currentDirection = {};
 	currentDirection["Player1"] = 'up';
 	currentDirection["Player2"] = 'down';
 
+
+function autoPlayer1() {
+	if(currentDirection["Player1"] == "up") {
+		newDir = 68;
+	} else if(currentDirection["Player1"] == "left") { 
+		newDir = 87;
+	} else if(currentDirection["Player1"] == "down") { 
+		newDir = 65;
+	} else if(currentDirection["Player1"] == "right") { 
+		newDir = 83;
+	}	
+	changeDirection('Player1',newDir);
+}
+	
+	
 $(document).ready(function(){
 	bikeCoord["Player1"] = startCoord["Player1"];
 	bikeCoord["Player2"] = startCoord["Player2"];
+	
 	
 	//$('body').keypress(changeDirection);
 		document.onkeydown = function(event) {
@@ -51,8 +68,10 @@ $(document).ready(function(){
 			    keyCode = event.keyCode; 
 			  }
 			  changeDirection(state,keyCode);
+			  console.log("Change = "+state +"-"+ keyCode);
 			} else {
 				/** spectators cannot change canvas */
+				console.log("No Fire");
 			}
 		}
 
@@ -64,14 +83,24 @@ $(document).ready(function(){
     // set drawStage method
     kin.setDrawStage(function(){
     	if(gameState == "running") {
+    		/**
+    		 * make Player1 auto
+    		 */
+    	    if(!autoPlayer1Timer) {
+    	    	autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
+    		}
     		
-	    	updateBikeHistory(state);
+				updateBikeHistory("Player1");
+				updateBikeHistory("Player2");
 	        kin.clear();
 	    	updateStage();
 	        drawBoundingBox();
 	        showFPS();
 	        var context = kin.getContext();
-	    	drawBike(state);
+		    	drawBike("Player1");
+		    	drawBike("Player2");
+    	} else/*if(gameState == "waiting") */{
+    		drawWait();
     	}
     });
 
@@ -81,6 +110,12 @@ function showFPS() {
     var context = kin.getContext();
 	context.font = "8pt Calibri";
     context.fillText("fps: "+kin.getFps(), 10, 10);
+}
+
+function drawWait() {
+    var context = kin.getContext();
+	context.font = "24pt Calibri";
+    context.fillText("Waiting for players", 20, 20);
 }
 
 /* detect change in direction */
@@ -94,16 +129,19 @@ function changeDirection(bikeState,key) {
 	} else if(key == 68) { 
 		currentDirection[bikeState] = "right";
 	}
-   	//now.sendMove(gameId,bikeState,bikeCoord[bikeState],currentDirection[bikeState]);
-
+	if(state == bikeState) {
+		now.sendMove(gameId,bikeState,bikeCoord[bikeState],currentDirection[bikeState]);
+	}
 }
 
 /** update stage - new coord */
 function updateStage() {
 	var linearDistEachFrame = bikeSpeed * kin.getTimeInterval() / 1000;
-	var playerNames =  {names:"Player1"/*, "Player2"*/};
+	
+	//playerNames = {names:"Player1", "Player2"};
+	var playerNames =  ["Player1", "Player2"]
 
-	for (playerPos in playerNames)	{
+	for (var playerPos in playerNames)	{
 		var player = playerNames[playerPos];
 		
 		/**
@@ -165,7 +203,7 @@ function endGame() {
 
 /** update previous bike positions - limit **/
 function updateBikeHistory(whichBike) {
-	var whichBike = "Player1";
+	//var whichBike = "Player1";
 	var historyCoord = {x : 0, y: 0, height: 1, width: 1};
 	var bikeData = bikeCoord[whichBike];
 	//console.log(bikeData);
@@ -246,6 +284,9 @@ function updateBikeHistory(whichBike) {
 
 /** draw bike **/
 function drawBike(bikeId) {
+	if(!bikeCoord[bikeId]) {
+		return false;
+	}
 	var context = kin.getContext();
 	var bikePosition = bikeCoord[bikeId];
 	//console.log(bikeId);
@@ -262,7 +303,11 @@ function drawBike(bikeId) {
 		    context.fillStyle = "#ccc";
 		    context.fill();
 		    context.lineWidth = 2;
-		    context.strokeStyle = "red";
+		    if(bikeId == "Player1") {
+		    	context.strokeStyle = "red";
+		    } else {
+		    	context.strokeStyle = "blue";
+		    }
 		}
 	    context.stroke();
 	}	
