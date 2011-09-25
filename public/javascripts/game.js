@@ -68,10 +68,9 @@ $(document).ready(function(){
 			    keyCode = event.keyCode; 
 			  }
 			  changeDirection(state,keyCode);
-			  console.log("Change = "+state +"-"+ keyCode);
 			} else {
 				/** spectators cannot change canvas */
-				console.log("No Fire");
+//				console.log("No Fire");
 			}
 		}
 

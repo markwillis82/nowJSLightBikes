@@ -133,6 +133,13 @@ everyone.now.joinGame = function(gameId){
 	gameGroup.addUser(this.user.clientId);
 	
 	this.now.returnState(state);
+
+	if(stats[gameId].length == 2) {
+		var gameGroup = nowjs.getGroup(gameId);
+		console.log("\t\tStarting Game: "+ gameId);
+		gameGroup.now.startGame();
+	}
+
 };
 
 everyone.now.sendMove = function(gameId,player,bikeCoord,currentDirection) {

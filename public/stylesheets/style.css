@@ -12,3 +12,12 @@ a {
 	height:500px;
 	width:800px;
 }
+
+#waiting p {
+	font-size:24px;
+	position: absolute;
+	top:200px;
+	left:100px;
+	background:#FFFFFF;
+	color:#FF0000;
+}
