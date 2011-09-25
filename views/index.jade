@@ -2,14 +2,19 @@ h1 Welcome to Light Bikes - similar (but not TRON)
 
 form(action="/join", method="post")
 	<br /><br />
-	label Name (required)
-	input(name="player")
-	<br /><br />
-	label Join Game Name (if not game entered - a waiting player will be joined
-	input(name="game")
-	<br /><br />
-	label Start
-	input(type="submit", value="Join")
+	- if (twitterName)
+		img(id="twitterImg", src="http://api.twitter.com/1/users/profile_image/#{twitterName}.json")
+		p#twitterName #{twitterName}
+		br.clear
+		<br /><br />
+		label Join Game Name (if not game entered - a waiting player will be joined
+		input(name="game")
+		<br /><br />
+		label Start
+		input(type="submit", value="Join")
+	- else
+		a(href="/auth/twitter") sign in with twitter
+
 	
 	
 	

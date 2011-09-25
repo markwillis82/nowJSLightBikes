@@ -21,3 +21,22 @@ a {
 	background:#FFFFFF;
 	color:#FF0000;
 }
+
+
+#twitterName {
+	font-size: 16px;
+	float: left;
+}
+
+#twitterImg {
+	float: left;
+}
+
+
+.clear {
+	clear: both;
+}
+
+#twitterName {
+	display: none;
+}

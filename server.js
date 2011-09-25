@@ -46,32 +46,60 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+// oAuth setup
+var OAuth= require('oauth').OAuth;
+var oa = new OAuth(
+	"https://api.twitter.com/oauth/request_token",
+	"https://api.twitter.com/oauth/access_token",
+	"9i4da04eWdh3tQPh9K8Tw",
+	"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
+	"1.0",
+	"http://127.0.0.1:9999/auth/twitter/callback",
+	"HMAC-SHA1"
+);
+
+
+
+
 // Routes
 
 /** game page **/
 app.get('/game/:gameId/', function(req, res){
+	var twitterId = 0;
+	var twitterName = '';
 	var gameId = req.params.gameId;
-	
-	var gameIndex = waitingGames.indexOf(gameId);
-	
-	if(gameIndex != -1) {
-		/** move game from pending to running */
-		waitingGames.splice(gameIndex,1);
-		runningGames.push(gameId);
-		console.log("\tGame Started: "+gameId);
+	if(req.session.twitter) {
+		twitterId = req.session.twitter.user_id;
+		twitterName = req.session.twitter.screen_name;
+		
+		
+		var gameIndex = waitingGames.indexOf(gameId);
+		
+		if(gameIndex != -1) {
+			/** move game from pending to running */
+			waitingGames.splice(gameIndex,1);
+			runningGames.push(gameId);
+			console.log("\tGame Started: "+gameId);
+			
+		} else {
+			/** push game onto waiting list */
+			waitingGames.push(gameId);
+			stats[gameId] = [];
+			//everyone.now.updateWaiting(gameId);
+			console.log("\tGame Waiting: "+gameId);
+		}
 		
 	} else {
-		/** push game onto waiting list */
-		waitingGames.push(gameId);
-		stats[gameId] = [];
-		//everyone.now.updateWaiting(gameId);
-		console.log("\tGame Waiting: "+gameId);
+		// we don't start the game for non-signed in users
+		req.session.gameId = gameId;
+
 	}
-	
 	
 	  res.render('game', {
 	    title: 'Light Bikes - game: '+ gameId,
-	    gameId: gameId
+	    gameId: gameId,
+	    twitterId: twitterId,
+	    twitterName: twitterName
 	  });
 	
 	nowjs.on('connect', function () {
@@ -83,10 +111,19 @@ app.get('/game/:gameId/', function(req, res){
 
 /** start page **/
 app.get('/', function(req, res){
+	var twitterId = 0;
+	var twitterName = '';
+	if(req.session.twitter) {
+		twitterId = req.session.twitter.user_id;
+		twitterName = req.session.twitter.screen_name;
+	}
+	
 	  res.render('index', {
 	    title: 'Light Bikes',
 	    waitingGames: waitingGames,
-	    runningGames: runningGames
+	    runningGames: runningGames,
+	    twitterId: twitterId,
+	    twitterName: twitterName
 	  });
 	});
 
@@ -108,11 +145,57 @@ app.post('/join', function(req, res){
 });
 
 
+app.get('/auth/twitter', function(req, res){
+	oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
+	  if (error) {
+			console.log(error);
+			res.send("yeah no. didn't work.")
+		}
+	  else {
+			req.session.oauth = {};
+	    req.session.oauth.token = oauth_token;
+			//console.log('oauth.token: ' + req.session.oauth.token);
+	    req.session.oauth.token_secret = oauth_token_secret;
+			//console.log('oauth.token_secret: ' + req.session.oauth.token_secret);
+	    res.redirect('https://twitter.com/oauth/authenticate?oauth_token='+oauth_token)
+	  }
+	});
+});
+
+app.get('/auth/twitter/callback', function(req, res, next){
+	  if (req.session.oauth) {
+	    req.session.oauth.verifier = req.query.oauth_verifier;
+	    var oauth = req.session.oauth;
+
+	    oa.getOAuthAccessToken(oauth.token,oauth.token_secret,oauth.verifier, 
+	      function(error, oauth_access_token, oauth_access_token_secret, results){
+	        if (error){
+						console.log(error);
+						res.send("yeah something broke.");
+					} else {
+						req.session.oauth.access_token = oauth_access_token;
+						req.session.oauth,access_token_secret = oauth_access_token_secret;
+						req.session.twitter = results;
+	        	console.log(results);
+	        	console.log(req.session);
+	        			if(req.session.gameId) {
+	        				res.redirect("/game/"+req.session.gameId+"/");
+	        			} else {
+	        				res.redirect('/');
+	        			}
+						
+					}
+	    	}
+	  	);
+		} else
+	  	next(new Error("you're not supposed to be here."))
+});
+
 /**
  * clever - aSync nowJS parts
  */
 
-everyone.now.joinGame = function(gameId){
+everyone.now.joinGame = function(gameId,twitterName){
 	
 	if(stats[gameId].length > 1) {
 		var state = "Spectator";
@@ -120,12 +203,12 @@ everyone.now.joinGame = function(gameId){
 	
 	} else if(stats[gameId].length == 1) {
 		var state = "Player2";
-		stats[gameId].push(this.user.clientId);
+		stats[gameId].push(twitterName);
 		console.log("\t\t\tAdding Player2: "+gameId);
 	
 	} else if(stats[gameId].length == 0) { 
 		var state = "Player1";
-		stats[gameId].push(this.user.clientId);
+		stats[gameId].push(twitterName);
 		console.log("\t\t\tAdding Player1: "+gameId);
 
 	}
@@ -137,7 +220,7 @@ everyone.now.joinGame = function(gameId){
 	if(stats[gameId].length == 2) {
 		var gameGroup = nowjs.getGroup(gameId);
 		console.log("\t\tStarting Game: "+ gameId);
-		gameGroup.now.startGame();
+		gameGroup.now.startGame(stats[gameId]);
 	}
 
 };

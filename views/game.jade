@@ -1,17 +1,31 @@
-script(type='text/javascript', src='/javascripts/kinetic.js')
-script(type='text/javascript', src='/javascripts/game.js')
-script(type='text/javascript', src='/javascripts/gameNow.js')
+- if (twitterName)
+
+	script(type='text/javascript', src='/javascripts/kinetic.js')
+	script(type='text/javascript', src='/javascripts/game.js')
+	script(type='text/javascript', src='/javascripts/gameNow.js')
+	
+	
+	h1= title
+	p
+		strong#state Loading
+	
+	p#gameId= gameId	
+	
+	div#Players
+		img#p1Img
+		span#p1Name
+		img#p2Img
+		span#p2Name
+	
+	
+	div#waiting
+		p Waiting for players
+	
+	canvas#gameMap(width="800",height="500")
+	
+	a(href="/") Home
 
 
-h1= title
-p
-	strong#state Loading
-
-p#gameId= gameId	
-
-div#waiting
-	p Waiting for players
-
-canvas#gameMap(width="800",height="500")
-
-a(href="/") Home
+	p#twitterName #{twitterName}
+- else
+	a(href="/auth/twitter/") sign in with twitter

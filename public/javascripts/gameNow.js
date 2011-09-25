@@ -7,7 +7,7 @@ $(document).ready(function(){
 	    state = runningState;
 	    $("#state").html(state);
 	    gameId = $("#gameId").html();
-	    now.joinGame(gameId);
+	    now.joinGame(gameId,$("#twitterName").html());
 
 	  }
 	
@@ -38,7 +38,14 @@ $(document).ready(function(){
 	    
 	}
 	
-	now.startGame = function() {
+	now.startGame = function(users) {
+		var i=0;
+		for (id in users) {
+			i++;
+			twit = users[id];
+			$("#p"+i+"Img").attr("src","http://api.twitter.com/1/users/profile_image/"+twit+".json");
+			$("#p"+i+"Name").html(twit);
+		}
 		gameState = "running";
 		$("#waiting").hide();
 		kin.startAnimation();
