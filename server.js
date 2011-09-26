@@ -106,6 +106,7 @@ app.get('/game/:gameId/', function(req, res){
 		  this.now.connectMessage('Loading: ' + this.user.clientId);
 	});
 
+
 });
 
 
@@ -197,25 +198,43 @@ app.get('/auth/twitter/callback', function(req, res, next){
 
 everyone.now.joinGame = function(gameId,twitterName){
 	
-	if(stats[gameId].length > 1) {
-		var state = "Spectator";
-		console.log("\t\t\tAdding Spectator: "+gameId);
+	/**
+	 * detect if user is already in the game - if so, return there state
+	 */
+	var currentPos = -1;//stats[gameId].indexOf(twitterName);
+	if(currentPos == -1) {
+		if(stats[gameId].length > 2) {
+			var state = "Spectator";
+			console.log("\t\t\tAdding Spectator: "+gameId);
+		
+		} else if(stats[gameId].length == 1) {
+			var state = "Player2";
+			stats[gameId].push(twitterName);
+			console.log("\t\t\tAdding Player2: "+gameId);
+		
+		} else if(stats[gameId].length == 0) { 
+			var state = "Player1";
+			stats[gameId].push(twitterName);
+			console.log("\t\t\tAdding Player1: "+gameId);
 	
-	} else if(stats[gameId].length == 1) {
-		var state = "Player2";
-		stats[gameId].push(twitterName);
-		console.log("\t\t\tAdding Player2: "+gameId);
-	
-	} else if(stats[gameId].length == 0) { 
+		}
+	} else if (currentPos == 0) { // they are player 1
 		var state = "Player1";
-		stats[gameId].push(twitterName);
-		console.log("\t\t\tAdding Player1: "+gameId);
-
+		console.log("\t\t\tPlayer1 Rejoin");
+		
+	} else if (currentPos == 1) { // they are player 2
+		var state = "Player2";
+		console.log("\t\t\tPlayer2 Rejoin");
+	
+	} else { // they are a spectator
+		var state = "Spectator";
+		console.log("\t\t\tSpectator Rejoin");
+	
 	}
 	var gameGroup = nowjs.getGroup(gameId);
 	gameGroup.addUser(this.user.clientId);
 	
-	this.now.returnState(state);
+	this.now.returnState(state,stats[gameId]);
 
 	if(stats[gameId].length == 2) {
 		var gameGroup = nowjs.getGroup(gameId);
@@ -227,10 +246,21 @@ everyone.now.joinGame = function(gameId,twitterName){
 
 everyone.now.sendMove = function(gameId,player,bikeCoord,currentDirection) {
 	var gameGroup = nowjs.getGroup(gameId);
-	console.log("\t\tSending Move: "+ gameId + " - p:"+player);
+	console.log("\t\tSending Move: "+ gameId + " - p:"+player + " - "+ currentDirection);
 	gameGroup.exclude(this.user.clientId).now.receiveMove(player,bikeCoord,currentDirection);
 }
 
+everyone.now.sendEnd = function(gameId) {
+	var gameGroup = nowjs.getGroup(gameId);
+	console.log("\t\tGame Ended: "+ gameId);
+	gameGroup.now.finishGame();
+}
+
+nowjs.on('disconnect', function () {
+	/**
+	 * we need to remove this user from any games/groups and update spectator lists
+	 */
+});
 
 
 

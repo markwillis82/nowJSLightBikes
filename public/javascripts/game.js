@@ -4,19 +4,21 @@ var canvasHeight = 500;
 var borderWidth = 10;
 var gameState = "waiting";
 var autoPlayer1Timer = false;
+var finishGame = false;
+var bikeSize = 2;
 /**
  * slight whoopsie - X = y and Y = x
  */
 
 var bikeCoord = {};
-	bikeCoord["Player1"] = ({x : 400, y: 400, height: 10, width: 10});
-	bikeCoord["Player2"] = {x : 400, y: 400, height: 10, width: 10};
+	bikeCoord["Player1"] = ({x : 400, y: 400, height: bikeSize, width: bikeSize});
+	bikeCoord["Player2"] = {x : 400, y: 400, height: bikeSize, width: bikeSize};
 
 //var startPos1 = {x : 400, y: 200, height: 10, width: 10};
 //var startPos2 = {x : 400, y: 700, height: 10, width: 10};
 var startCoord = {};
-	startCoord["Player1"] = {x : 400, y: 200, height: 10, width: 10};
-	startCoord["Player2"] = {x : 400, y: 700, height: 10, width: 10};
+	startCoord["Player1"] = {x : 400, y: 200, height: bikeSize, width: bikeSize};
+	startCoord["Player2"] = {x : 400, y: 700, height: bikeSize, width: bikeSize};
 
 var bikeHistory = {};
 	bikeHistory["Player1"] = [];
@@ -89,15 +91,22 @@ $(document).ready(function(){
     	    	autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
     		}
     		
+	        kin.clear();
+	        drawBoundingBox();
+	        if(kin.isAnimating()) {
 				updateBikeHistory("Player1");
 				updateBikeHistory("Player2");
-	        kin.clear();
-	    	updateStage();
-	        drawBoundingBox();
-	        showFPS();
-	        var context = kin.getContext();
-		    	drawBike("Player1");
-		    	drawBike("Player2");
+		    	updateStage();
+		        showFPS();
+		        var context = kin.getContext();
+			    	drawBike("Player1");
+			    	drawBike("Player2");
+	        }	
+		    if(finishGame) {
+	        	drawCollision();
+	        }
+	        
+		    	
     	} else/*if(gameState == "waiting") */{
     		drawWait();
     	}
@@ -115,6 +124,15 @@ function drawWait() {
     var context = kin.getContext();
 	context.font = "24pt Calibri";
     context.fillText("Waiting for players", 20, 20);
+}
+
+function drawCollision() {
+//	console.log(bikePosition);
+    var context = kin.getContext();
+	context.font = "24pt Calibri";
+    context.fillText("Collision", 20, 20);
+    finishGame = false;
+//    now.sendEnd(gameId);
 }
 
 /* detect change in direction */
@@ -197,6 +215,10 @@ function updateStage() {
 /** end game **/
 function endGame() {
 	kin.stopAnimation();
+	
+	if(autoPlayer1Timer) {
+		clearTimeout(autoPlayer1Timer);
+	}
 }
 
 
@@ -221,6 +243,8 @@ function updateBikeHistory(whichBike) {
 		if(historyDirection[whichBike] == "up" && bikeHistory[whichBike][0]) {
 			bikeHistory[whichBike][0].x = historyCoord.x;
 		}
+		
+		
 		/*
 		if(historyDirection == "down" && bikeHistory[0]) {
 			bikeHistory[0].height = historyCoord.height;
@@ -290,7 +314,12 @@ function drawBike(bikeId) {
 	var bikePosition = bikeCoord[bikeId];
 	//console.log(bikeId);
 	/** draw history blocks in different colour - then layer bike ontop */
+	
 	if(bikeHistory[bikeId]) {
+		
+		/** the last line in the path should be green - this allows for collision detection to look for red or blue */
+		var historyLength = bikeHistory[bikeId].length;
+
 		context.beginPath();
 		for ( var int = 0; int < bikeHistory[bikeId].length; int++) {
 			var history = bikeHistory[bikeId][int];
@@ -302,20 +331,29 @@ function drawBike(bikeId) {
 		    context.fillStyle = "#ccc";
 		    context.fill();
 		    context.lineWidth = 2;
-		    if(bikeId == "Player1") {
-		    	context.strokeStyle = "red";
-		    } else {
-		    	context.strokeStyle = "blue";
+//		    console.log(int + " - " + (historyLength-1));
+		    /**
+		     * on the last element of the history - check for collision before drawing the line
+		     */
+		    if(int == (historyLength - 2)) {
+//		    	context.strokeStyle = "#00FF00";
+		        /*
+		         * detect collision with a line (lazy detection)
+		         */
+		        if(checkCollision(bikePosition.y,bikePosition.x,bikePosition.width,bikePosition.height)) {
+		        	finishGame = true;
+		        	
+		        }
+		    	
 		    }
+		    if(bikeId == "Player1") {
+		    	context.strokeStyle = "#FF0000";
+		    } else {
+		    	context.strokeStyle = "#0000FF";
+		    }
+		    context.stroke();
 		}
-	    context.stroke();
 	}	
-    /*
-     * detect collision with a line (lazy detection
-     */
-//    if(checkCollision(bikePosition.x,bikePosition.y,bikePosition.width,bikePosition.height)) {
-//    	endGame();
-//    }
 	var left = bikePosition.x;
 	var top = bikePosition.y;
 		
@@ -342,7 +380,14 @@ function checkCollision(x,y,width,height) {
 		if (pix[i] != 0) {
 //			console.log(pix[i]);
 			return true;
+		} else if (pix[i+1] != 0) {
+//			console.log(pix[i]);
+			return true;
+		} else if (pix[i+2] != 0) {
+//			console.log(pix[i]);
+			return true;
 		}
+
 	}
 	return false;
 }
