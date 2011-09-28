@@ -78,9 +78,10 @@ $(document).ready(function(){
 	}
 	
 	
-	now.receiveMove = function(player,newBikeCoord,newCurrentDirection) {
+	now.receiveMove = function(player,newBikeCoord,newCurrentDirection,prevHistory) {
 		currentDirection[player] = newCurrentDirection;
 		bikeCoord[player] = newBikeCoord;
+		bikeHistory[player] = prevHistory;
 	}
 	
 	now.finishGame = function() {

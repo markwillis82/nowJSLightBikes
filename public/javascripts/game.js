@@ -88,7 +88,7 @@ $(document).ready(function(){
     		 * make Player1 auto
     		 */
     	    if(!autoPlayer1Timer) {
-    	    	autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
+    	    	//autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
     		}
     		
 	        kin.clear();
@@ -132,7 +132,7 @@ function drawCollision() {
 	context.font = "24pt Calibri";
     context.fillText("Collision", 20, 20);
     finishGame = false;
-//    now.sendEnd(gameId);
+    now.sendEnd(gameId);
 }
 
 /* detect change in direction */
@@ -147,7 +147,7 @@ function changeDirection(bikeState,key) {
 		currentDirection[bikeState] = "right";
 	}
 	if(state == bikeState) {
-		now.sendMove(gameId,bikeState,bikeCoord[bikeState],currentDirection[bikeState]);
+		now.sendMove(gameId,bikeState,bikeCoord[bikeState],currentDirection[bikeState],bikeHistory[bikeState]);
 	}
 }
 
@@ -319,7 +319,6 @@ function drawBike(bikeId) {
 		
 		/** the last line in the path should be green - this allows for collision detection to look for red or blue */
 		var historyLength = bikeHistory[bikeId].length;
-
 		context.beginPath();
 		for ( var int = 0; int < bikeHistory[bikeId].length; int++) {
 			var history = bikeHistory[bikeId][int];
@@ -335,17 +334,17 @@ function drawBike(bikeId) {
 		    /**
 		     * on the last element of the history - check for collision before drawing the line
 		     */
-		    if(int == (historyLength - 2)) {
+		    //if(int == (historyLength - 3)) {
 //		    	context.strokeStyle = "#00FF00";
 		        /*
 		         * detect collision with a line (lazy detection)
 		         */
-		        if(checkCollision(bikePosition.y,bikePosition.x,bikePosition.width,bikePosition.height)) {
+		        if(checkCollision(bikePosition.y,bikePosition.x,bikePosition.width,bikePosition.height,bikeId)) {
 		        	finishGame = true;
 		        	
 		        }
 		    	
-		    }
+		    //}
 		    if(bikeId == "Player1") {
 		    	context.strokeStyle = "#FF0000";
 		    } else {
@@ -354,6 +353,7 @@ function drawBike(bikeId) {
 		    context.stroke();
 		}
 	}	
+
 	var left = bikePosition.x;
 	var top = bikePosition.y;
 		
@@ -371,19 +371,29 @@ function drawBike(bikeId) {
 /*
  * check for non-Black bar on new area
  */
-function checkCollision(x,y,width,height) {
+function checkCollision(x,y,width,height,ignore) {
 	var context = kin.getContext();
 	var imgd = context.getImageData(x, y, width, height);
 	var pix = imgd.data;
 	for (var i = 0; n = pix.length, i < n; i += 4) {
 //		console.log(pix[i]);
 		if (pix[i] != 0) {
+			if(ignore == "Player1") {
+				return false;
+			}
+			//console.log("col: "+ignore);
 //			console.log(pix[i]);
 			return true;
 		} else if (pix[i+1] != 0) {
 //			console.log(pix[i]);
-			return true;
+			//return true;
+			return false;
 		} else if (pix[i+2] != 0) {
+			if(ignore == "Player2") {
+				return false;
+			}
+
+			//console.log("col2: "+ignore);
 //			console.log(pix[i]);
 			return true;
 		}
@@ -398,9 +408,13 @@ function checkCollision(x,y,width,height) {
 function drawBoundingBox() {
 	var context = kin.getContext();
 	context.beginPath();
+
     context.rect(0, 0, canvasWidth, canvasHeight);
- 
+	context.fillStyle = "black";
+    context.fill();
+    
     context.lineWidth = 5;
     context.strokeStyle = 'red';
     context.stroke();
+    context.fillStyle = "white";
 }

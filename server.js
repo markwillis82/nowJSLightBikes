@@ -54,7 +54,7 @@ var oa = new OAuth(
 	"9i4da04eWdh3tQPh9K8Tw",
 	"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 	"1.0",
-	"http://127.0.0.1:9999/auth/twitter/callback",
+	"http://192.168.10.97:9999/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -244,16 +244,18 @@ everyone.now.joinGame = function(gameId,twitterName){
 
 };
 
-everyone.now.sendMove = function(gameId,player,bikeCoord,currentDirection) {
+everyone.now.sendMove = function(gameId,player,bikeCoord,currentDirection,prevHistory) {
 	var gameGroup = nowjs.getGroup(gameId);
 	console.log("\t\tSending Move: "+ gameId + " - p:"+player + " - "+ currentDirection);
-	gameGroup.exclude(this.user.clientId).now.receiveMove(player,bikeCoord,currentDirection);
+	gameGroup.exclude(this.user.clientId).now.receiveMove(player,bikeCoord,currentDirection,prevHistory);
 }
 
 everyone.now.sendEnd = function(gameId) {
 	var gameGroup = nowjs.getGroup(gameId);
 	console.log("\t\tGame Ended: "+ gameId);
 	gameGroup.now.finishGame();
+	delete stats[gameId];
+	//nowjs.groupDel(gameId);
 }
 
 nowjs.on('disconnect', function () {
