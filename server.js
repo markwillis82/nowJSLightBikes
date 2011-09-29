@@ -260,9 +260,9 @@ everyone.now.joinGame = function(gameId,twitterName){
 	
 	}
 	var gameGroup = nowjs.getGroup(gameId);
-	if(gameGroup.hasClient(this.user.clientId)) {
+//	if(gameGroup.hasClient(this.user.clientId)) {
 		gameGroup.addUser(this.user.clientId);
-	}
+//	}
 	
 	this.now.returnState(state,stats[gameId]);
 
