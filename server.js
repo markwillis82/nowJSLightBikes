@@ -74,7 +74,7 @@ if(!debug) {
 			"9i4da04eWdh3tQPh9K8Tw",
 			"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 			"1.0",
-			"http://127.0.0.1:"+portToRun+"/auth/twitter/callback",
+			"http://192.168.0.2:"+portToRun+"/auth/twitter/callback",
 			"HMAC-SHA1"
 		);
 }
@@ -229,6 +229,7 @@ everyone.now.joinGame = function(gameId,twitterName){
 	 * detect if user is already in the game - if so, return there state
 	 */
 	var currentPos = stats[gameId].indexOf(twitterName);
+	console.log(stats[gameId]);
 	if(currentPos == -1) {
 		if(stats[gameId].length > 2) {
 			var state = "Spectator";
