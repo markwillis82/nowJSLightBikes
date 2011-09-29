@@ -54,7 +54,7 @@ var oa = new OAuth(
 	"9i4da04eWdh3tQPh9K8Tw",
 	"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 	"1.0",
-	"http://192.168.10.97:9999/auth/twitter/callback",
+	"http://nodetron.nodester.com/auth/twitter/callback",
 	"HMAC-SHA1"
 );
 
@@ -266,7 +266,7 @@ nowjs.on('disconnect', function () {
 
 
 
-app.listen(9999);
+app.listen(12103);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 
