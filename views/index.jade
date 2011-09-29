@@ -1,35 +1,48 @@
-h1 Welcome to Light Bikes - similar (but not TRON)
+div.fullWidth
 
-form(action="/join", method="post")
-	<br /><br />
-	- if (twitterName)
-		img(id="twitterImg", src="http://api.twitter.com/1/users/profile_image/#{twitterName}.json")
-		p#twitterName #{twitterName}
-		br.clear
-		<br /><br />
-		label Join Game Name (if not game entered - a waiting player will be joined
-		input(name="game")
-		<br /><br />
-		label Start
-		input(type="submit", value="Join")
-	- else
-		a(href="/auth/twitter")
-			img(src="https://si0.twimg.com/images/dev/buttons/sign-in-with-twitter-d.png")
+	form(action="/join", method="post")
+		- if (twitterName)
+			div.left150
+				img(id="twitterImg", src="http://api.twitter.com/1/users/profile_image/#{twitterName}.json")
+				<br />
+				p#twitterName #{twitterName}
+			div.clear10
+			div.left300
+				p Please enter the game you wish to join. If no game name is entered a waiting player will be joined.
+				div.clear10
+				p
+					input(name="game")
+				div(style="clear:both;height:10px")
+				
+				input(type="image", id="submit", class="btnImage", src="/images/submit.png")
+		- else
+			div.twitterSignIn
+				a(href="/auth/twitter")
+					img(src="/images/twitterSignIn.png", width="351", height="174")
+	
+	div.left150Margin
+		h2 Pending Games
+		ul.gameList
+			each item in waitingGames
+				li
+					a(href="/game/#{item}/", target="_blank")= item
+			
+			
+	div#left150Margin
+		h2 Running Games
+		ul.gameList
+			each item in runningGames
+				li= item
+				
+				
 
+	div.clear20
 	
-	
-	
-	
-div#waitingGames
-	h2 Pending Games
+	p Welcome to NodeTron, my entry to NowJS' RTT competition. There are still some outstanding issues:
 	ul
-		each item in waitingGames
-			li
-				a(href="/game/#{item}/", target="_blank")= item
-		
-		
-div#runningGames
-	h2 Running Games
-	ul
-		each item in runningGames
-			li= item
+		li Collision detection is a bit excited at times
+		li May have some network lag, all bike coordinates are sent on move change
+		li Add some graphics to the bikes rather then dots
+		li Change waiting message / game over message
+	
+	p To play just sign in with twitter and either join a game below or start a game.

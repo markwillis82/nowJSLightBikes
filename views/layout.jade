@@ -1,10 +1,44 @@
 !!!
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(type='text/javascript', src='/javascripts/jquery.js')
-    script(type='text/javascript', src='/nowjs/now.js')
-    script(type='text/javascript', src='/javascripts/nows.js')
-    
-  body!= body
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(type='text/javascript', src='/javascripts/jquery.js')
+		script(type='text/javascript', src='/nowjs/now.js')
+		script(type='text/javascript', src='/javascripts/nows.js')
+		script(type='text/javascript', src='/javascripts/menu.js')
+
+
+	body
+		div.wrapper
+			header#header
+				hgroup
+					div.fullWidth
+						div.headerContainer
+							img(src="/images/title.png",width="538", height="81")
+							<br /><br />
+							div.width350
+								div.left150
+									h2.heading A game written in 
+								div.left200
+									img(src="/images/nodejs_logo.png",width="194", height="47")
+						div.right300
+							img(src="/images/bikeFaded.png",width="241", height="171")		
+
+			div.clear
+			nav.menu
+				ul
+					li#home
+						a.menuLink(href="/") Home
+					li#Info
+						a.menuLink(href="/info/") Info
+
+			div.clear						
+			
+			section#content(class="content")!= body
+			
+			<div class="push"></div>
+		div.footer.footerDesc
+			footer.footerPadding
+				p NodeTron - A game by 
+					a(href="http://mwillis.co.uk", target="_blank") Mark Willis

@@ -45,7 +45,7 @@ $(document).ready(function(){
 					$("#p"+i+"Name").html(twit);
 				} else {
 					
-					var player = '<p><img src="http://api.twitter.com/1/users/profile_image/'+twit+'.json" />'+twit+'</p>';
+					var player = '<li><img src="http://api.twitter.com/1/users/profile_image/'+twit+'.json" />'+twit+'</li>';
 					$("#spectators").append(player);
 				}
 			}

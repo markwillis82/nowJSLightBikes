@@ -1,42 +1,270 @@
-body {
-  padding: 0px;
-  font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
+@charset "utf-8";
+/* CSS Document */
+
+* {
+	margin: 0;
 }
 
-a {
-  color: #00B7FF;
+html, body {
+	height: 100%;
+	background-color:#C4C4C4;
+	/* Safari 4+, Chrome 1-9 */
+	background: -webkit-gradient(linear, right center, left center, from(#C4C4C4), to(#E5E5E5));
+
+   /* Firefox 3.6+ */
+   background: -moz-linear-gradient(right, #C4C4C4, #E5E5E5);
+
+   /* IE 10+ */
+   background-image: -ms-linear-gradient(right, #C4C4C4, #E5E5E5);
+
+   /* Opera 11.10+ */
+   background-image: -o-linear-gradient(right, #C4C4C4, #E5E5E5);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#C4C4C4', endColorstr='#E5E5E5')"; /* IE8 */
 }
 
-#gameMap {
-
-	height:500px;
-	width:800px;
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -4em;
+	width:960px;
+	background-color:#FFF;
 }
 
-#waiting p {
-	font-size:24px;
-	position: absolute;
-	top:200px;
-	left:100px;
-	background:#FFFFFF;
-	color:#FF0000;
-}
-
-
-#twitterName {
-	font-size: 16px;
-	float: left;
-}
-
-#twitterImg {
-	float: left;
+.footer, .push {
+	height: 4em;
+	width:960px;
+	margin:auto;
+	background-color:#FFF;
 }
 
 
-.clear {
-	clear: both;
+.menu
+{
+	width:100%; height:39px; background-color:#E9E9E9;
 }
 
-#twitterName {
-	display: none;
+/* Menu */
+.menu ul {list-style:none;margin:0;padding:0;}
+
+.menu li {
+	float:left;
+	width:100px;
+	height:39px;
+	margin:0;
+	padding:0;
+	text-align:center;
+	background:#C4C8D0;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:0.75em;
+	font-weight:bold;
+	color:#333;
+}
+
+.menu li a {display:block;color:#333;text-decoration:none;}
+
+.menu li a:hover, .menu li a:focus, .menu li a:active {color:#666;}
+
+.menuLink
+{
+	padding-top:12px;
+	color:#333;
+}
+
+p,li {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:0.75em;
+	color:#333;
+	line-height:20px;
+}
+
+h1 {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:1.1em;
+	color:#333;
+}
+
+h2 {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:0.9em;
+	color:#333;
+}
+
+.content
+{
+	padding:20px;
+}
+
+.footerPadding
+{
+	padding:20px;
+}
+
+.footerDesc
+{
+	color:#333;
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#C4C4C4), to(#E5E5E5));
+
+   /* Safari 5.1+, Mobile Safari, Chrome 10+ */
+   background-image: -webkit-linear-gradient(top, #C4C4C4, #E5E5E5); 
+
+   /* Firefox 3.6+ */
+   background-image: -moz-linear-gradient(top, #C4C4C4, #E5E5E5);
+
+   /* IE 10+ */
+   background-image: -ms-linear-gradient(top, #C4C4C4, #E5E5E5);
+
+   /* Opera 11.10+ */
+   background-image: -o-linear-gradient(top, #C4C4C4, #E5E5E5);
+   
+   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40); /* IE6+ */
+
+    progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#C4C4C4', endColorstr='#E5E5E5'); /* IE6 & IE7 */
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr='#C4C4C4', endColorstr='#E5E5E5')"; /* IE8 */
+}
+
+/* Game List */
+
+.gameList ul
+{
+	
+}
+
+.gameList li
+{
+	list-style:disc;
+	line-height:25px;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:0.8em;
+	color:#333;
+	font-weight:bold;
+}
+
+.gameList a:link
+{
+	color:#6ED5F5;
+	text-decoration:underline;
+	font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.gameList a:hover, .gameList a:visited
+{
+	color:#6ED5F5;
+	text-decoration:none;
+	font-family:Arial, Helvetica, sans-serif;
+
+}
+
+
+.fullWidth
+{
+	width:100%;
+}
+
+.headerContainer
+{
+	width:550px; float:left; padding:15px;
+}
+
+.width350
+{
+	width:350px;
+}
+
+.heading
+{
+	margin-top:20px; margin-left:10px;
+}
+
+.left150
+{
+	width:150px; float:left;
+}
+
+.left150Margin
+{
+	width:150px; float:left; margin-left:40px;
+}
+
+.left200
+{
+	width:200px; float:left;
+}
+
+.left300
+{
+	width:300px; float:left;
+}
+
+.left120
+{
+	width: 120px; float:left;
+}
+
+.left120Margin
+{
+	width: 120px; float:left; margin-left:20px;
+}
+
+.right300
+{
+	width:300px; float:right; padding-top:10px;
+}
+
+.clear
+{
+	clear:both;
+}
+
+.clear10
+{
+	clear:both; height:10px;
+}
+
+.clear20
+{
+	clear:both; height:20px;
+}
+
+.width200
+{
+	width:200px;
+}
+
+.btnImage
+{
+	width:124px; height:29px;
+}
+
+.gameScreenContainer
+{
+	width:800px; float:left;
+}
+
+.spectatorList
+{
+	width:150px; float:left; margin-left:10px;
+}
+
+.noMarginPadding
+{
+	margin:0; padding:0;
+}
+
+.noMarginPadding li
+{
+	list-style:none;
+}
+
+.width960
+{
+	width:960px;
+}
+
+.twitterSignIn
+{
+	width:351px; float:left;
 }

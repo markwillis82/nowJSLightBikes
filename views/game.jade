@@ -4,33 +4,42 @@
 	script(type='text/javascript', src='/javascripts/game.js')
 	script(type='text/javascript', src='/javascripts/gameNow.js')
 	
-	
-	h1= title
-	p
-		strong#state Loading
-	
-	p#gameId= gameId	
-	
-	div#Players
-		img#p1Img
-		span#p1Name
-		img#p2Img
-		span#p2Name
-	
-	
-	div#waiting
-		p Waiting for players
-	
-	canvas#gameMap(width="800",height="500")
-	
-	img#canvasImg
-	
-	a(href="/") Home
-
-	div#spectators
-	
-	
-	p#twitterName #{twitterName}
+	div.fullWidth
+		div.left300
+			h1= title
+			div.clear20
+			div
+				p
+					strong#state Loading
+				div.clear20
+				p#gameId= gameId	
+		
+		div.left300
+			div.left120
+				img#p1Img
+				<br />
+				p#p1Name
+			div.left120
+				img#p2Img
+				<br />
+				p#p2Name
+		
+		div.clear20
+		
+		div.width960
+			div.gameScreenContainer
+				div#waiting
+					p Waiting for players
+				canvas#gameMap(width="800",height="500")
+				img#canvasImg
+			
+			div.spectatorList
+				p Spectators:
+				div.clear
+				ul.gameList.noMarginPadding#spectators
+				
+		div.clear
+					
 - else
 	a(href="/auth/twitter/") 
-		img(src="https://si0.twimg.com/images/dev/buttons/sign-in-with-twitter-d.png")
+		img(src="/images/twitterSignIn.png", width="351", height="174")
