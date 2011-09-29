@@ -228,7 +228,7 @@ everyone.now.joinGame = function(gameId,twitterName){
 	/**
 	 * detect if user is already in the game - if so, return there state
 	 */
-	var currentPos = -1;//stats[gameId].indexOf(twitterName);
+	var currentPos = stats[gameId].indexOf(twitterName);
 	if(currentPos == -1) {
 		if(stats[gameId].length > 2) {
 			var state = "Spectator";
