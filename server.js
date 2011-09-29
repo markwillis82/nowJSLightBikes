@@ -64,7 +64,7 @@ if(!debug) {
 		"9i4da04eWdh3tQPh9K8Tw",
 		"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 		"1.0",
-		"http://nodetron.nodester.com:"+portToRun+"/auth/twitter/callback",
+		"http://nodetron.nodester.com/auth/twitter/callback",
 		"HMAC-SHA1"
 	);
 } else {
