@@ -6,6 +6,8 @@ var gameState = "waiting";
 var autoPlayer1Timer = false;
 var finishGame = false;
 var bikeSize = 2;
+
+var gameEnded = false;
 /**
  * slight whoopsie - X = y and Y = x
  */
@@ -88,7 +90,7 @@ $(document).ready(function(){
     		 * make Player1 auto
     		 */
     	    if(!autoPlayer1Timer) {
-    	    	autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
+    	    	//autoPlayer1Timer = setInterval('autoPlayer1()', 1000);
     		}
     		
 	        kin.clear();
@@ -98,9 +100,10 @@ $(document).ready(function(){
 				updateBikeHistory("Player2");
 		    	updateStage();
 		        showFPS();
-		        var context = kin.getContext();
+//		        var context = kin.getContext();
 			    	drawBike("Player1");
 			    	drawBike("Player2");
+			    	
 	        }	
 		    if(finishGame) {
 	        	drawCollision();
@@ -116,12 +119,14 @@ $(document).ready(function(){
 
 function showFPS() {
     var context = kin.getContext();
+    context.fillStyle = "white";
 	context.font = "8pt Calibri";
     context.fillText("fps: "+kin.getFps(), 10, 10);
 }
 
 function drawWait() {
     var context = kin.getContext();
+    context.fillStyle = "white";
 	context.font = "24pt Calibri";
     context.fillText("Waiting for players", 20, 20);
 }
@@ -129,10 +134,14 @@ function drawWait() {
 function drawCollision() {
 //	console.log(bikePosition);
     var context = kin.getContext();
+    context.fillStyle = "white";
 	context.font = "24pt Calibri";
     context.fillText("Collision", 20, 20);
     finishGame = false;
-    //now.sendEnd(gameId);
+    if(!gameEnded) {
+    	now.sendEnd(gameId);
+    	gameEnded = true;
+    }
 }
 
 /* detect change in direction */
@@ -214,11 +223,12 @@ function updateStage() {
 
 /** end game **/
 function endGame() {
-	kin.stopAnimation();
+	//kin.stopAnimation();
 	
 	if(autoPlayer1Timer) {
 		clearTimeout(autoPlayer1Timer);
 	}
+	drawCollision();
 }
 
 
@@ -334,21 +344,10 @@ function drawBike(bikeId) {
 		    /**
 		     * on the last element of the history - check for collision before drawing the line
 		     */
-		    if(int == (historyLength - 3)) {
+//		    if(int == (historyLength - 3)) {
 //		    	context.strokeStyle = "#00FF00";
-		        /*
-		         * detect collision with a line (lazy detection)
-		         */
-		    	var col = checkCollision(bikePosition.y,bikePosition.x,bikePosition.width,bikePosition.height,bikeId);
-		        if(col) {
-		        	if(col != bikeId) {
-			        	console.log(col + " -- " + bikeId);
-			        	finishGame = true;
-		        	}
-		        	
-		        }
 		    	
-		    }
+//		    }
 		    if(bikeId == "Player1") {
 		    	context.strokeStyle = "#FF0000";
 		    } else {
@@ -357,6 +356,17 @@ function drawBike(bikeId) {
 		    context.stroke();
 		}
 	}	
+    /*
+     * detect collision with a line (lazy detection)
+     */
+	bikePos = bikeCoord[state];
+	var col = checkCollision(bikePos.y,bikePos.x,bikePos.width,bikePos.height,state);
+    if(col) {
+    	if(col != state) {
+        	console.log(col + " -- " + state);
+        	finishGame = true;
+    	}
+    }
 
 	var left = bikePosition.x;
 	var top = bikePosition.y;
@@ -381,24 +391,28 @@ function checkCollision(x,y,width,height,ignoreBike) {
 	var pix = imgd.data;
 	for (var i = 0; n = pix.length, i < n; i += 4) {
 //		console.log(pix[i]);
-		if (pix[i] != 0) {
+		if (/*pix[i] < 240 && */pix[i] > 0) {
 			if(ignoreBike == "Player1") {
 				return false;
 			}
 			//console.log("col: "+ignore);
-//			console.log(pix[i]);
+			//console.log("r:"+pix[i]);
+			//console.log("Player1");
+			//console.log(pix[i]+","+pix[i+1]+","+pix[i+2]+","+pix[i+2]);
 			return ignoreBike;
 		} else if (pix[i+1] != 0) {
 //			console.log(pix[i]);
 			//return true;
 			return false;
-		} else if (pix[i+2] != 0) {
+		} else if (pix[i+2] < 255 && pix[i+2] > 0) { /* player 1 has odd collision detection, seems to have white block and black block */
 			if(ignoreBike == "Player2") {
 				return false;
 			}
-
 			//console.log("col2: "+ignore);
-//			console.log(pix[i]);
+			console.log("Player2 -- "+ignoreBike);
+			console.log(pix[i]+","+pix[i+1]+","+pix[i+2]+","+pix[i+2]);
+
+			console.log("b:"+pix[i+2]);
 			return ignoreBike;
 		}
 
@@ -420,5 +434,5 @@ function drawBoundingBox() {
     context.lineWidth = 5;
     context.strokeStyle = 'red';
     context.stroke();
-    context.fillStyle = "white";
+    
 }

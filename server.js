@@ -260,10 +260,14 @@ everyone.now.joinGame = function(gameId,twitterName){
 	
 	}
 	var gameGroup = nowjs.getGroup(gameId);
-	gameGroup.addUser(this.user.clientId);
+	if(gameGroup.hasClient(this.user.clientId)) {
+		gameGroup.addUser(this.user.clientId);
+	}
 	
 	this.now.returnState(state,stats[gameId]);
 
+	
+	/** we need to dispose of this game when it's finished **/
 	if(stats[gameId].length == 2) {
 		var gameGroup = nowjs.getGroup(gameId);
 		console.log("\t\tStarting Game: "+ gameId);
