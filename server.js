@@ -5,6 +5,13 @@ var waitingGames = [];
 var runningGames = [];
 var stats = [];
 
+var debug = false;
+var portToRun = process.env["app_port"];
+if(!portToRun) {
+	portToRun = 9999;
+	var debug = true;
+}
+
 
 /**
  * Module dependencies.
@@ -17,11 +24,13 @@ var app = module.exports = express.createServer();
 
 var nowjs = require("now");
 
+var nowOptions = {};
 
-var nowOptions = {
-//	  socketio : {'transports': ['xhr-polling']}   // This is the options object passed into io.listen(port, options)
-	};
-
+if(!debug) {
+	var nowOptions = {
+		  socketio : {'port': 80}   // This is the options object passed into io.listen(port, options)
+		};
+}
 
 var everyone = nowjs.initialize(app,nowOptions);
 
@@ -48,16 +57,27 @@ app.configure('production', function(){
 
 // oAuth setup
 var OAuth= require('oauth').OAuth;
-var oa = new OAuth(
-	"https://api.twitter.com/oauth/request_token",
-	"https://api.twitter.com/oauth/access_token",
-	"9i4da04eWdh3tQPh9K8Tw",
-	"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
-	"1.0",
-	"http://nodetron.nodester.com/auth/twitter/callback",
-	"HMAC-SHA1"
-);
-
+if(!debug) {
+	var oa = new OAuth(
+		"https://api.twitter.com/oauth/request_token",
+		"https://api.twitter.com/oauth/access_token",
+		"9i4da04eWdh3tQPh9K8Tw",
+		"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
+		"1.0",
+		"http://nodetron.nodester.com:"+portToRun+"/auth/twitter/callback",
+		"HMAC-SHA1"
+	);
+} else {
+	var oa = new OAuth(
+			"https://api.twitter.com/oauth/request_token",
+			"https://api.twitter.com/oauth/access_token",
+			"9i4da04eWdh3tQPh9K8Tw",
+			"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
+			"1.0",
+			"http://127.0.0.1:"+portToRun+"/auth/twitter/callback",
+			"HMAC-SHA1"
+		);
+}
 
 
 
@@ -96,7 +116,7 @@ app.get('/game/:gameId/', function(req, res){
 	}
 	
 	  res.render('game', {
-	    title: 'Light Bikes - game: '+ gameId,
+	    title: 'NodeTron - game: '+ gameId,
 	    gameId: gameId,
 	    twitterId: twitterId,
 	    twitterName: twitterName
@@ -120,13 +140,20 @@ app.get('/', function(req, res){
 	}
 	
 	  res.render('index', {
-	    title: 'Light Bikes',
+	    title: 'NodeTron',
 	    waitingGames: waitingGames,
 	    runningGames: runningGames,
 	    twitterId: twitterId,
 	    twitterName: twitterName
 	  });
-	});
+});
+
+/** info page **/
+app.get('/info/', function(req, res){
+	  res.render('info', {
+	    title: 'NodeTron',
+	  });
+});
 
 
 /** join game **/
@@ -140,7 +167,7 @@ app.post('/join', function(req, res){
 	req.session.gameId = gameId;
 	
   res.render('join', {
-	title: 'Light Bikes',
+	title: 'NodeTron',
     gameId: req.session.gameId
   });
 });
@@ -264,9 +291,7 @@ nowjs.on('disconnect', function () {
 	 */
 });
 
-
-
-app.listen(12103);
+app.listen(portToRun);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 
