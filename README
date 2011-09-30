@@ -1,1 +1,11 @@
 nowJS.org Hackathon Entry
+
+I still have some outstanding issues, but they game is mostly there.
+
+	Collision detection is a bit excited at times
+	May have some network lag, all bike coordinates are sent on move change
+	Add some graphics to the bikes rather then dots
+	Change waiting message / game over message
+	
+
+Playing over local LAN is best as the network lag is minimal. I would like to continue to fix the collision detection (Player 2 works but I cant get Player 1 to work)
