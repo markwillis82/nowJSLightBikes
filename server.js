@@ -7,6 +7,9 @@ var stats = [];
 
 var debug = false;
 var portToRun = process.env["app_port"];
+
+var host = 'nodetron.nodester.com';
+
 if(!portToRun) {
 	portToRun = 9999;
 	var debug = true;
@@ -64,7 +67,7 @@ if(!debug) {
 		"9i4da04eWdh3tQPh9K8Tw",
 		"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 		"1.0",
-		"http://nodetron.nodester.com/auth/twitter/callback",
+		"http://"+host+"/auth/twitter/callback",
 		"HMAC-SHA1"
 	);
 } else {
@@ -74,7 +77,7 @@ if(!debug) {
 			"9i4da04eWdh3tQPh9K8Tw",
 			"76rC8ogZ70khB4Vh0BVm73qfK68DwZxGMzFs650TJwI",
 			"1.0",
-			"http://192.168.0.2:"+portToRun+"/auth/twitter/callback",
+			"http://"+host+":"+portToRun+"/auth/twitter/callback",
 			"HMAC-SHA1"
 		);
 }
